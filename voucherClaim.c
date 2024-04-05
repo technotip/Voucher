@@ -1,29 +1,5 @@
 #include "hookapi.h"
 
-#define BYTES53_TO_BUF(buf_raw, i)\
-{\
-    unsigned char* buf = (unsigned char*)buf_raw;\
-    *(uint64_t*)(buf + 0) = *(uint64_t*)(i +  0);\
-    *(uint64_t*)(buf + 8) = *(uint64_t*)(i +  8);\
-    *(uint64_t*)(buf + 16) = *(uint64_t*)(i + 16);\
-    *(uint64_t*)(buf + 24) = *(uint64_t*)(i + 24);\
-    *(uint64_t*)(buf + 32) = *(uint64_t*)(i + 32);\
-    *(uint64_t*)(buf + 40) = *(uint64_t*)(i + 40);\   
-    *(uint64_t*)(buf + 48) = *(uint64_t*)(i + 48);\  
-    *(uint8_t*)(buf + 5) = *(uint8_t*)(i + 5);\  
-}
-
-#define BYTES33_TO_BUF(buf_raw, i)\
-{\
-    unsigned char* buf = (unsigned char*)buf_raw;\
-    *(uint64_t*)(buf + 0) = *(uint64_t*)(i +  0);\
-    *(uint64_t*)(buf + 8) = *(uint64_t*)(i +  8);\
-    *(uint64_t*)(buf + 16) = *(uint64_t*)(i + 16);\
-    *(uint64_t*)(buf + 24) = *(uint64_t*)(i + 24);\
-    *(uint64_t*)(buf + 32) = *(uint64_t*)(i + 32);\
-    *(uint8_t*)(buf + 1) = *(uint8_t*)(i + 1);\  
-}
-
 #define BYTES20_TO_BUF(buf_raw, i)\
 {\
     unsigned char* buf = (unsigned char*)buf_raw;\
@@ -65,19 +41,13 @@ int64_t hook(uint32_t) {
     uint8_t blob[117];
     if(otxn_field(blob - 1, 118, sfBlob) != 118)
         rollback(SBUF("Voucher Claim: Blob must be 64 + 33 + 20 = 117 bytes."), __LINE__);
-    
-   uint8_t payload[53];
-   BYTES53_TO_BUF(payload, blob + 64);
-
-   uint8_t voucher[33];
-   BYTES33_TO_BUF(voucher, blob + 64);
 
    uint8_t destination[32];
-   BYTES20_TO_BUF(DEST_OUT - 2, payload + 33 );
-   BYTES20_TO_BUF(destination, payload + 33 );
+   otxn_field(SBUF(destination), sfAccount);   
+   BYTES20_TO_BUF(DEST_OUT - 2, blob + 97 );
 
-   if(!util_verify(payload, 53, blob, 64, SBUF(voucher)))
-        rollback(SBUF("Voucher Claim: Not Authorized"), __LINE__);
+   if(util_verify(blob + 64, 53, blob, 64, blob + 64, 33) != 1)
+        rollback(SBUF("Voucher Claim: Not Authorized"), __LINE__);        
   
    if(state(AMOUNT_OUT + 1, 8, SBUF(destination)) != 8)
        rollback(SBUF("Voucher Claim: Voucher claimed or not present."), __LINE__);
