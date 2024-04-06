@@ -28,14 +28,14 @@ int64_t hook(uint32_t) {
 
     uint8_t pname[2] = { 0x56U, 0x43U };
     uint8_t state_key[32];
-    if(otxn_param(state_key, 20, pname, 2) != 20)
+    if(otxn_param(state_key - 1, 33, pname, 2) != 33)
         rollback(SBUF("Voucher Create: Please pass valid account id."), __LINE__);
 
     uint8_t vault[8];
     if(state(SBUF(vault), SBUF(state_key)) == 8)
         rollback(SBUF("Voucher Create: Voucher already present."), __LINE__);
 
-    if (state_set(SBUF(amount), SBUF(state_key)) < 0)
+    if (state_set(SBUF(amount), SBUF(state_key)) != 8)
 	   rollback(SBUF("Voucher Create: Failed to create Voucher."), __LINE__);
 
    accept(SBUF("Voucher Created Successful."), __LINE__);

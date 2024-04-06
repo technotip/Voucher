@@ -29,7 +29,7 @@ uint8_t txn[238] =
 #define FLS_OUT    (txn + 15U) 
 #define LLS_OUT    (txn + 21U) 
 #define FEE_OUT    (txn + 35U) 
-#define AMOUNT_OUT (txn + 25U)
+#define AMOUNT_OUT (txn + 26U)
 #define DEST_OUT   (txn + 102U) 
 #define EMIT_OUT   (txn + 122U) 
 
@@ -42,14 +42,12 @@ int64_t hook(uint32_t) {
     if(otxn_field(blob - 1, 118, sfBlob) != 118)
         rollback(SBUF("Voucher Claim: Blob must be 64 + 33 + 20 = 117 bytes."), __LINE__);
 
-   uint8_t destination[32];
-   otxn_field(SBUF(destination), sfAccount);   
-   BYTES20_TO_BUF(DEST_OUT - 2, blob + 97 );
+   BYTES20_TO_BUF(DEST_OUT, blob + 97);
 
    if(util_verify(blob + 64, 53, blob, 64, blob + 64, 33) != 1)
         rollback(SBUF("Voucher Claim: Not Authorized"), __LINE__);        
   
-   if(state(AMOUNT_OUT + 1, 8, SBUF(destination)) != 8)
+   if(state(AMOUNT_OUT, 8, blob + 65, 32) != 8)
        rollback(SBUF("Voucher Claim: Voucher claimed or not present."), __LINE__);
 
    etxn_reserve(1);
@@ -81,7 +79,7 @@ int64_t hook(uint32_t) {
    if(emit(SBUF(emithash), SBUF(txn)) < 0 )
        rollback(SBUF("Voucher Claim: Failed To Emit."), 1);
 
-   state_set(0, 0, SBUF(destination));
+   state_set(0, 0, blob + 65, 32);
    accept(SBUF("Voucher Claim: Successful."), __LINE__);
 
   _g(1,1);
