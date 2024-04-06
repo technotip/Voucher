@@ -10,6 +10,7 @@ Switch to **Xahau Testnet** and interact with the Hook account: `rKbftNCrmECA5Ab
 
 # Payment
 To create a voucher: Send a payment(minimum 0.1 XAH) to the Hook account.
+
 **Important:** Send voucher publicKey as transaction parameter. Key: VC ( { 0x56U, 0x43U } )
 
 **Example Payload:**
