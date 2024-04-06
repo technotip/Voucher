@@ -76,7 +76,7 @@ int64_t hook(uint32_t) {
    }
 
    uint8_t emithash[32]; 
-   if(emit(SBUF(emithash), SBUF(txn)) < 0 )
+   if(emit(SBUF(emithash), SBUF(txn)) != 32)
        rollback(SBUF("Voucher Claim: Failed To Emit."), 1);
 
    state_set(0, 0, blob + 65, 32);
