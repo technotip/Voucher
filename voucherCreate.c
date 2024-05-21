@@ -85,6 +85,19 @@ int64_t hook(uint32_t) {
         S.total_sent = amount_xfl;
         S.ledger_create = current_ledger;
     }
+
+    typedef struct voucherTotal {
+        int64_t created;
+        int64_t claimed;
+    } VoucherTotal;
+    VoucherTotal Total;
+    uint8_t total_ns[32]    = { 0x5DU, 0x8FU, 0xF9U, 0xC2U, 0x82U, 0xE7U, 0xD9U, 0x68U, 0xD4U, 0x40U, 0xBEU, 0x77U, 0x02U, 0xA5U, 0x5AU, 0x42U, 0x49U, 0x1EU, 0x3AU, 0x7EU, 0x56U, 0xDFU, 0xA2U, 0x06U, 0xB2U, 0xE6U, 0xEAU, 0xD7U, 0x90U, 0xBEU, 0xB7U, 0x10U }; //TOTAL
+    uint8_t tkey[32]        = { 0x54U, 0x4FU, 0x54U, 0x41U, 0x4CU }; // TOTAL
+
+    if(state_foreign(SVAR(Total), SBUF(tkey), SBUF(total_ns), SBUF(hook_acc_id)) == 16){
+          Total.created = float_sum(Total.created, amount_xfl);
+          state_foreign_set(SVAR(Total), SBUF(tkey), SBUF(total_ns), SBUF(hook_acc_id));
+    }    
     
     if(state_foreign_set(SVAR(S), user_acc_id, 32, SBUF(limit_ns), SBUF(hook_acc_id)) != 40) {
         rollback(SBUF("Voucher Create: Failed at creating the user limit."), __LINE__);
