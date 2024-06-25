@@ -9,7 +9,7 @@ Switch to **Xahau Testnet** and interact with the Hook account: `rvoucheredGC1mB
 
 
 # Payment
-To create a voucher: Send a payment(minimum 0.1 XAH) to the Hook account.
+To create a voucher: Send a payment(minimum 2 XAH) to the Hook account.
 
 **Important:** Send voucher publicKey as transaction parameter. Key: VC ( { 0x56U, 0x43U } )
 
@@ -56,3 +56,59 @@ Limit the creation and claiming of vouchers per month per user.
 Ex: You can only create a total of 500 XAH vouchers per month. Similarly, you can only claim 500 XAH vouchers per month.
 Limit can be set using an Admin account.
 Keeps track of global total vouchers created and claimed via the hook.
+
+
+# SetHook
+We are using [hooks-toolkit](https://hooks-toolkit.com/quickstart) to build and install the hook.
+Build command:
+```
+c2wasm-cli contracts build
+ts-node install.ts
+```
+install.ts
+```
+import { createHookPayload } from "@transia/hooks-toolkit";
+import { SetHookFlags } from "@transia/xrpl";
+import { derive, utils, sign } from "xrpl-accountlib";
+
+const wss = "wss://xahau-test.net";   // For mainnet, use: wss://xahau.network
+
+const main = async () => {
+  const secret = ""; //use proper familySeed
+  const account = derive.familySeed(secret);
+
+  const hook1 = createHookPayload({
+    version: 0,
+    createFile: "voucherClaim",
+    namespace: "VC",
+    flags: SetHookFlags.hsfOverride,
+    hookOnArray: ["Invoke"],
+  });
+
+  const hook2 = createHookPayload({
+    version: 0,
+    createFile: "voucherCreate",
+    namespace: "VC",
+    flags: SetHookFlags.hsfOverride,
+    hookOnArray: ["Payment"],
+  });
+
+  const networkInfo = await utils.txNetworkAndAccountValues(wss, master);
+
+  const payload = {
+    TransactionType: "SetHook",
+    Flags: 0,
+    Hooks: [{ Hook: hook1 }, { Hook: hook2 }],
+    ...networkInfo.txValues,
+    Account: "rvoucheredGC1mB4yd2CBjs7jGMRTLexe",
+  };
+
+  const temp = sign(payload, account);
+  // const result = await signAndSubmit(payload, wss, account);
+  // console.log(JSON.stringify(result, null, "\t"));
+  console.log(JSON.stringify(temp, null, "\t"));
+};
+
+main();
+
+```
