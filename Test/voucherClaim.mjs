@@ -33,7 +33,7 @@ const networkInfo = await utils.txNetworkAndAccountValues(wss, account);
 const InvokeTx = {
   TransactionType: "Invoke",
   Account: account.address,
-  Destination: "rKbftNCrmECA5Ab3YqitU5RNC9HtX6eEb8",
+  Destination: "rvoucheredGC1mB4yd2CBjs7jGMRTLexe",
   Blob: null,
   ...networkInfo.txValues,
 };
