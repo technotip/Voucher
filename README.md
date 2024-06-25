@@ -100,7 +100,7 @@ const main = async () => {
     Flags: 0,
     Hooks: [{ Hook: hook1 }, { Hook: hook2 }],
     ...networkInfo.txValues,
-    Account: "rvoucheredGC1mB4yd2CBjs7jGMRTLexe",
+    Account: account.address,
   };
 
   const temp = sign(payload, account);
