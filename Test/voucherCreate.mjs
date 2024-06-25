@@ -10,7 +10,7 @@ const main = async () => {
   const networkInfo = await utils.txNetworkAndAccountValues(wss, account);
   const payload = {
     TransactionType: "Payment",
-    Destination: "rKbftNCrmECA5Ab3YqitU5RNC9HtX6eEb8",
+    Destination: "rvoucheredGC1mB4yd2CBjs7jGMRTLexe",
     Amount: "100000",
     NetworkID: "21338",
     HookParameters: [
