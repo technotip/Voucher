@@ -93,7 +93,7 @@ const main = async () => {
     hookOnArray: ["Payment"],
   });
 
-  const networkInfo = await utils.txNetworkAndAccountValues(wss, master);
+  const networkInfo = await utils.txNetworkAndAccountValues(wss, account.address);
 
   const payload = {
     TransactionType: "SetHook",
